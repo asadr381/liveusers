@@ -6,19 +6,27 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://tracking.ulspk.com", // Ensure no trailing slash
+    origin: "https://tracking.ulspk.com",
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
-// Your socket.io connection logic
-io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+const activeUsers = new Set();
 
-  // Example to track active users
+io.on('connection', (socket) => {
+  activeUsers.add(socket.id);
+  io.emit('activeUsersCount', activeUsers.size); // Emit the count when a user connects
+
+  console.log(`A user connected: ${socket.id}`);
+  console.log(`Active users: ${activeUsers.size}`);
+
   socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+    activeUsers.delete(socket.id);
+    io.emit('activeUsersCount', activeUsers.size); // Emit the count when a user disconnects
+
+    console.log(`User disconnected: ${socket.id}`);
+    console.log(`Active users: ${activeUsers.size}`);
   });
 });
 
