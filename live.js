@@ -1,20 +1,28 @@
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
+const cors = require("cors");
 
 const app = express();
+app.use(cors({ origin: "http://localhost:3000" })); // Replace with your local app's origin
+
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000", // Replace with your local app's origin
+    methods: ["GET", "POST"],
+  },
+});
 
 let activeUsers = 0;
 
 io.on("connection", (socket) => {
   activeUsers++;
-  io.emit("userCount", activeUsers); // Send the updated user count to all clients
+  io.emit("userCount", activeUsers);
 
   socket.on("disconnect", () => {
     activeUsers--;
-    io.emit("userCount", activeUsers); // Update all clients when a user disconnects
+    io.emit("userCount", activeUsers);
   });
 });
 
