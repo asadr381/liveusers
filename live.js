@@ -9,7 +9,7 @@ app.use(cors({ origin: "https://tracking.ulspk.com/" })); // Replace with your l
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000", // Replace with your local app's origin
+    origin: "https://tracking.ulspk.com/", // Replace with your local app's origin
     methods: ["GET", "POST"],
   },
 });
