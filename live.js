@@ -13,7 +13,9 @@ const io = new Server(server, {
 });
 
 const activeUsers = new Set();
-
+app.get('/', (req, res) => {
+  res.send('Welcome to the Socket.io server!');
+});
 io.on('connection', (socket) => {
   activeUsers.add(socket.id);
   io.emit('activeUsersCount', activeUsers.size); // Emit the count when a user connects
