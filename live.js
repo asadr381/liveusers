@@ -1,30 +1,31 @@
-const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+const cors = require("cors");
 
 const app = express();
+app.use(cors({ origin: "https://tracking.ulspk.com/" })); // Replace with your local app's origin
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["https://tracking.ulspk.com"], // Allow your production domain
+    origin: "http://localhost:3000", // Replace with your local app's origin
     methods: ["GET", "POST"],
-    credentials: true,
   },
 });
 
-// Your socket.io connection logic
-io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+let activeUsers = 0;
 
-  // Handle other socket events here
+io.on("connection", (socket) => {
+  activeUsers++;
+  io.emit("userCount", activeUsers);
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+  socket.on("disconnect", () => {
+    activeUsers--;
+    io.emit("userCount", activeUsers);
   });
 });
 
-// Start the server
-const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+server.listen(3001, () => {
+  console.log("Server is running on port 3001");
 });
